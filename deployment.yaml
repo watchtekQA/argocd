@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          #image: 172.16.142.25:5000/myapp:latest
+          image: 172.16.142.25:5000/myapp:1.0.0
+          #imagePullPolicy: Never
+          imagePullPolicy: Always
+          #imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+#          volumeMounts:
+#            - name: apm-agent
+#              mountPath: /watchall/apm/agent.java/conf
+#            - name: db-properties
+#              mountPath: /Watchall/MyApp/webapps/ROOT/WEB-INF/properties/db.properties
+#              subPath: db.properties
+#            - name: index-config-volume
+#              mountPath: /Watchall/MyApp/webapps/ROOT/index.html
+#              subPath: index.html
+#          env:
+#          - name: JAVA_OPTS
+#            value: " -javaagent:/watchall/apm/agent.java/watchall.agent.jar -Dwatchall.config=/watchall/apm/agent.java/conf/watchall.conf "
+#      volumes:
+#        - name: apm-agent
+#          configMap:
+#            name: apm-agent-config
+#            items:
+#            - key: "watchall.conf"
+#              path: "watchall.conf"
+#        - name: db-properties
+#          configMap:
+#            name: myapp-db-properties-config
+#            items:
+#            - key: "db.properties"
+#              path: "db.properties"
+#        - name: index-config-volume
+#          configMap:
+#            name: myapp-index-html-config
+#            items:
+#            - key: "index.html"
+#              path: "index.html"  
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-lb
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "http-myapplb"
+    port: 28080
+    targetPort: 8080
+  #externalIPs:
+  # - 172.16.142.25
+  selector:
+    app: myapp
